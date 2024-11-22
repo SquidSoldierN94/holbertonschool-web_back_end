@@ -10,6 +10,7 @@ export default function taskBlock(trueOrFalse) {
   if (trueOrFalse) {
     const task = true;
     const task2 = false;
+    console.log('Inside block:', task, task2);
   }
 
   return [task, task2];
