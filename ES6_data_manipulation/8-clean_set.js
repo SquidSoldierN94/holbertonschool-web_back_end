@@ -1,5 +1,4 @@
 export default function cleanSet(set, startString) {
-
   if (startString === '') return '';
 
   const ArrayToModify = Array.from(set);
