@@ -1,15 +1,12 @@
 export default function cleanSet(set, startString) {
-  if (startString === '') {
-    return '';
-  }
 
-  const resultArray = [];
+  if (startString === '') return '';
 
-  for (const value of set) {
-    if (value.startsWith(startString)) {
-      resultArray.push(value.slice(startString.length));
-    }
-  }
+  const ArrayToModify = Array.from(set);
 
-  return resultArray.join('-');
+  const FilteredArray = ArrayToModify.filter((words) => words.startsWith(startString));
+  const ArrayWithoutPrefix = FilteredArray.map((words) => words.slice(startString.length));
+
+  const resultString = ArrayWithoutPrefix.join('-');
+  return resultString;
 }
