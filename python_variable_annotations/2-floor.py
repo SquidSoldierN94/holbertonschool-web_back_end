@@ -3,9 +3,9 @@
 import math
 
 """
-This module contains a function `floor` that takes a float value
-as an argument and returns the floor of that float.
-It demonstrates the use of the math module and type annotations.
+This module contains a function `floor` that computes the floor of a given float.
+It uses the `math` module to calculate the largest integer less than or equal to the provided float.
+This module also demonstrates the use of type annotations in Python.
 """
 
 
@@ -13,11 +13,11 @@ def floor(n: float) -> int:
     """
     Returns the floor of the given float number.
 
-    The floor of a number is the largest integer less than or equal
-    to the number. For example, the floor of 3.14 is 3.
+    The floor of a number is the largest integer less than or equal to the number.
+    For example, the floor of 3.14 is 3.
 
     Parameters:
-    n (float): The number to compute the floor value of.
+    n (float): The number for which the floor value is computed.
 
     Returns:
     int: The floor value of the input float.
