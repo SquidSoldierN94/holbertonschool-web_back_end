@@ -6,7 +6,6 @@ as arguments and returns their concatenation as a single string.
 This module demonstrates type annotations for string operations in Python.
 """
 
-
 def concat(str1: str, str2: str) -> str:
     """
     Concatenates two string arguments and returns the resulting string.
