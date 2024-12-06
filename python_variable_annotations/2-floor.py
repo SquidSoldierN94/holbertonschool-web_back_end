@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
+
 import math
+
+"""
+This module contains a function `floor` that takes a float value
+as an argument and returns the floor of that float.
+It demonstrates the use of the math module and type annotations.
+"""
+
 
 def floor(n: float) -> int:
     """
-    Returns the floor of a given floating-point number.
+    Returns the floor of the given float number.
 
-    The floor function returns the largest integer less than or equal 
-    to the input number.
+    The floor of a number is the largest integer less than or equal
+    to the number. For example, the floor of 3.14 is 3.
 
     Parameters:
-    n (float): The floating-point number to be floored.
+    n (float): The number to compute the floor value of.
 
     Returns:
-    int: The largest integer less than or equal to n.
+    int: The floor value of the input float.
     """
     return math.floor(n)
