@@ -4,8 +4,9 @@ import math
 
 """
 This module contains a function `floor` that computes the floor of a given float.
-It uses the `math` module to calculate the largest integer less than or equal to the provided float.
-This module also demonstrates the use of type annotations in Python.
+It uses the `math` module to calculate the largest integer less than or equal
+to the provided float. This module also demonstrates the use of type annotations
+in Python.
 """
 
 
