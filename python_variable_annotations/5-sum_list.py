@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
-from typing import List
+"""
+This module `sum_list` which computes the sum of a list of floats.
 
+It uses type to indicate that the input is a list of floats, and the return
+value is a float. The function the built-in Python `sum()` function to compute
+the sum of the numbers in the list.
 """
-This module a function `sum_list` that computes the sum of a list of floats.
-It demonstrates the use of type annotations and the built-in `sum()` function.
-"""
+
+
+from typing import List
 
 
 def sum_list(input_list: List[float]) -> float:
