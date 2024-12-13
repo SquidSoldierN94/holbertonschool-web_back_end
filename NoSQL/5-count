@@ -1,0 +1,11 @@
+#!/bin/bash
+# This script displays the number of documents in the "school" collection in the specified database
+
+# Ensure that the database name is provided as an argument when running the script
+if [ -z "$1" ]; then
+  echo "Usage: $0 <database_name>"
+  exit 1
+fi
+
+# Display the number of documents in the "school" collection in the provided database
+mongo "$1" --quiet --eval 'print(db.school.countDocuments())'
