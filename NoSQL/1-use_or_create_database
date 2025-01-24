@@ -1,5 +1,2 @@
-#!/bin/bash
-# This script connects to MongoDB and switches to or creates the database "my_db"
-
-# Connect to MongoDB and run the use command for "my_db"
-mongo --quiet --eval "db = db.getSiblingDB('my_db'); print('switched to db ' + db.getName())"
+// Script that creates or use the database my_db
+use my_db

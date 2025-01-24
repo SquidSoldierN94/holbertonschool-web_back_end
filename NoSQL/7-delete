@@ -1,15 +1,2 @@
-#!/bin/bash
-# This script deletes all documents with name="Holberton school" in the "school" collection
-# of the specified database
-
-# Ensure that the database name is provided as an argument when running the script
-if [ -z "$1" ]; then
-  echo "Usage: $0 <database_name>"
-  exit 1
-fi
-
-# Delete the documents in the "school" collection
-mongo "$1" --quiet --eval '
-var result = db.school.deleteMany({ name: "Holberton school" });
-printjson(result)
-'
+// Script that deletes all documents with name="Holberton school" in the collection school
+db.school.deleteMany({name: "Holberton school"})

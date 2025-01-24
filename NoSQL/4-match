@@ -1,11 +1,2 @@
-#!/bin/bash
-# This script lists all documents with name="Holberton school" in the "school" collection in the specified database
-
-# Ensure that the database name is provided as an argument when running the script
-if [ -z "$1" ]; then
-  echo "Usage: $0 <database_name>"
-  exit 1
-fi
-
-# List all documents with name="Holberton school" in the "school" collection in the provided database
-mongo "$1" --quiet --eval 'db.school.find({ name: "Holberton school" }).forEach(printjson)'
+// Script that list all documents with "name="Holberton school" in the collection school
+db.school.find({name: "Holberton school"})

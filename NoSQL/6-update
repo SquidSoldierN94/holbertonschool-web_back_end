@@ -1,17 +1,2 @@
-#!/bin/bash
-# This script updates the "Holberton school" documents in the "school" collection 
-# of the specified database by adding the attribute "address" with the value "972 Mission street"
-
-# Ensure that the database name is provided as an argument when running the script
-if [ -z "$1" ]; then
-  echo "Usage: $0 <database_name>"
-  exit 1
-fi
-
-# Update the documents in the "school" collection
-mongo "$1" --quiet --eval '
-db.school.updateMany(
-  { name: "Holberton school" },
-  { $set: { address: "972 Mission street" } }
-)
-'
+// Script that adds a new attribute to a document in the collection school
+db.school.update({name: "Holberton school"}, {$set: {address: "972 Mission street"}}, {multi: true})

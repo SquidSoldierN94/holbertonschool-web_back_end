@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+Module Mongo
+"""
+
 from pymongo import MongoClient
 
 def log_stats():

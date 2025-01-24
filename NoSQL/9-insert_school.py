@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+Module Mongo
+"""
 
 def insert_school(mongo_collection, **kwargs):
     """
