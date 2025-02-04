@@ -5,10 +5,24 @@ Deletion-resilient hypermedia pagination
 
 import csv
 import math
-from typing import List, Dict, Any
+from typing import List, TypedDict, Optional, Dict
+
+
+class Hypermedia_page_data(TypedDict):
+    """
+    TypedDict to define the structure of the dictionary
+    returned by the get_hyper_index function.
+    """
+    index: Optional[int]
+    next_index: int
+    data: List[List]
+    page_size: int
+    data: int
+
 
 class Server:
-    """Server class to paginate a database of popular baby names.
+    """
+    Server class to paginate a database of popular baby names.
     """
     DATA_FILE = "Popular_Baby_Names.csv"
 
@@ -17,7 +31,8 @@ class Server:
         self.__indexed_dataset = None
 
     def dataset(self) -> List[List]:
-        """Cached dataset
+        """
+        Cached dataset
         """
         if self.__dataset is None:
             with open(self.DATA_FILE) as f:
@@ -28,48 +43,50 @@ class Server:
         return self.__dataset
 
     def indexed_dataset(self) -> Dict[int, List]:
-        """Dataset indexed by sorting position, starting at 0
+        """
+        Dataset indexed by sorting position, starting at 0
         """
         if self.__indexed_dataset is None:
             dataset = self.dataset()
+            truncated_dataset = dataset[:1000]
             self.__indexed_dataset = {
                 i: dataset[i] for i in range(len(dataset))
             }
         return self.__indexed_dataset
 
-    def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict[str, Any]:
+    def get_hyper_index(self, index: Optional[int] =
+                        None, page_size: int = 10) -> Hypermedia_page_data:
         """
-        Return a dictionary with pagination information that is resilient to deletions.
-
-        Args:
-            index (int): The start index for the current page (0-indexed).
-            page_size (int): The number of items per page.
-
-        Returns:
-            Dict[str, Any]: A dictionary containing pagination information.
+        Retrieves a page of data starting from the specified index,
+        with the given page size, and handles missing rows
+        due to deletions in the dataset.
         """
-        assert isinstance(index, int) and index >= 0, "index must be a non-negative integer"
-        assert isinstance(page_size, int) and page_size > 0, "page_size must be an integer greater than 0"
 
-        indexed_dataset = self.indexed_dataset()
-        dataset_len = len(indexed_dataset)
-        assert index < dataset_len, "index is out of range"
+        if index is None:
+            index = 0
 
-        data = []
-        next_index = index
-        current_count = 0
+        dataset = self.dataset()
+        full_dataset = len(dataset)
+        assert 0 <= index < full_dataset, "Index out of range"
 
-        while current_count < page_size and next_index < dataset_len:
-            if next_index in indexed_dataset:
-                data.append(indexed_dataset[next_index])
-                current_count += 1
-            next_index += 1
+        page_data = []
 
-        next_index = next_index if next_index < dataset_len else None
+        sorted_dataset = self.indexed_dataset()
+
+        current_index = index
+
+        while len(page_data) < page_size:
+
+            if current_index in sorted_dataset:
+                page_data.append(sorted_dataset[current_index])
+
+            current_index += 1
+
+        next_index = current_index
 
         return {
             'index': index,
-            'data': data,
-            'page_size': len(data),
-            'next_index': next_index
+            'next_index': next_index,
+            'page_size': page_size,
+            'data': page_data,
         }
