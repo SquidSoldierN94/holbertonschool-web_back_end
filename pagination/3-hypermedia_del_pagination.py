@@ -1,29 +1,15 @@
 #!/usr/bin/env python3
 """
-Deletion-resilient hypermedia pagination
+Deletion-resilient hypermedia pagination.
 """
 
 import csv
-import math
-from typing import List, TypedDict, Optional, Dict
-
-
-class Hypermedia_page_data(TypedDict):
-    """
-    TypedDict to define the structure of the dictionary
-    returned by the get_hyper_index function.
-    """
-    index: Optional[int]
-    next_index: int
-    data: List[List]
-    page_size: int
-    data: int
+from typing import List, Dict
 
 
 class Server:
-    """
-    Server class to paginate a database of popular baby names.
-    """
+    """Server class to paginate a database of popular baby names."""
+
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
@@ -31,62 +17,63 @@ class Server:
         self.__indexed_dataset = None
 
     def dataset(self) -> List[List]:
-        """
-        Cached dataset
+        """Loads the dataset from a CSV file if not already loaded.
+
+        Returns:
+            List[List]: The dataset as a list of lists.
         """
         if self.__dataset is None:
-            with open(self.DATA_FILE) as f:
+            with open(self.DATA_FILE, encoding="utf-8") as f:
                 reader = csv.reader(f)
                 dataset = [row for row in reader]
-            self.__dataset = dataset[1:]
+            self.__dataset = dataset[1:]  # Remove header
 
         return self.__dataset
 
     def indexed_dataset(self) -> Dict[int, List]:
-        """
-        Dataset indexed by sorting position, starting at 0
+        """Indexes the dataset to allow deletion-resilient pagination.
+
+        Returns:
+            Dict[int, List]: A dictionary with indices as keys and values.
         """
         if self.__indexed_dataset is None:
             dataset = self.dataset()
-            truncated_dataset = dataset[:1000]
             self.__indexed_dataset = {
                 i: dataset[i] for i in range(len(dataset))
             }
+
         return self.__indexed_dataset
 
-    def get_hyper_index(self, index: Optional[int] =
-                        None, page_size: int = 10) -> Hypermedia_page_data:
+    def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
+        """Returns a dictionary for deletion-resilient pagination.
+
+        Args:
+            index (int): The start index of the return page.
+            page_size (int): The number of items per page.
+
+        Returns:
+            Dict: A dictionary containing:
+                - `index`: The current start index.
+                - `next_index`: The next index to query.
+                - `page_size`: The current page size.
+                - `data`: The actual page of dataset.
         """
-        Retrieves a page of data starting from the specified index,
-        with the given page size, and handles missing rows
-        due to deletions in the dataset.
-        """
+        assert isinstance(index, int) and 0 <= index < len(
+            self.indexed_dataset()
+        ), "Invalid index"
 
-        if index is None:
-            index = 0
+        data = []
+        next_index = index
+        dataset = self.indexed_dataset()
 
-        dataset = self.dataset()
-        full_dataset = len(dataset)
-        assert 0 <= index < full_dataset, "Index out of range"
-
-        page_data = []
-
-        sorted_dataset = self.indexed_dataset()
-
-        current_index = index
-
-        while len(page_data) < page_size:
-
-            if current_index in sorted_dataset:
-                page_data.append(sorted_dataset[current_index])
-
-            current_index += 1
-
-        next_index = current_index
+        while len(data) < page_size and next_index < len(self.dataset()):
+            if next_index in dataset:
+                data.append(dataset[next_index])
+            next_index += 1
 
         return {
-            'index': index,
-            'next_index': next_index,
-            'page_size': page_size,
-            'data': page_data,
+            "index": index,
+            "next_index": next_index,
+            "page_size": len(data),
+            "data": data,
         }
