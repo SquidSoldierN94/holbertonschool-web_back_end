@@ -1,31 +1,32 @@
 #!/usr/bin/env python3
 """
-Module to paginate simple data
+Module to paginate simple data with hypermedia pagination.
 """
 
 import csv
 import math
-from typing import List, TypedDict, Optional
-
-index_range = __import__('0-simple_helper_function').index_range
+from typing import List, Dict, Tuple
 
 
-class Hypermedia(TypedDict):
+def index_range(page: int, page_size: int) -> Tuple[int, int]:
     """
-    TypedDict to define the structure of the dictionary
-    returned by the get_hyper function.
+    Returns a tuple containing the start and end indexes for pagination.
+
+    Args:
+        page (int): The current page number (1-indexed).
+        page_size (int): The number of items per page.
+
+    Returns:
+        Tuple[int, int]: (start index, end index)
     """
-    page_size: int
-    page: int
-    data: List[List]
-    next_page: Optional[int]
-    prev_page: Optional[int]
-    total_pages: int
+    start = (page - 1) * page_size
+    end = start + page_size
+    return (start, end)
 
 
 class Server:
     """
-    Server class to paginate a database of popular baby names.
+    Server class to handle dataset pagination with hypermedia response.
     """
     DATA_FILE = "Popular_Baby_Names.csv"
 
@@ -34,56 +35,66 @@ class Server:
 
     def dataset(self) -> List[List]:
         """
-        Cached dataset
+        Loads the dataset from the CSV file if not already loaded.
+
+        Returns:
+            List[List]: The dataset as a list of lists.
         """
         if self.__dataset is None:
-            with open(self.DATA_FILE) as f:
+            with open(self.DATA_FILE, encoding="utf-8") as f:
                 reader = csv.reader(f)
                 dataset = [row for row in reader]
-            self.__dataset = dataset[1:]
+            self.__dataset = dataset[1:]  # Remove header row
 
         return self.__dataset
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
         """
-        Function to get a specific page of the dataset
+        Returns a page of data from the dataset.
+
+        Args:
+            page (int): The page number (1-indexed).
+            page_size (int): The number of items per page.
+
+        Returns:
+            List[List]: The data corresponding to the requested page.
         """
-
-        assert isinstance(page, int) and isinstance(page_size, int)
-        assert page > 0 and page_size > 0
-
-        if (
-                page > 10 or page_size > 10) or (
-                    page < 1 or page_size < 1):
-            return []
+        assert isinstance(page, int), "Page must be an integer"
+        assert isinstance(page_size, int), "Page size must be an integer"
+        assert page > 0, "Page must be a positive integer"
+        assert page_size > 0, "Page size must be a positive integer"
 
         data = self.dataset()
-
         start, end = index_range(page, page_size)
+
+        if start >= len(data):  # If the start index is out of range
+            return []
+
         return data[start:end]
 
-    def get_hyper(self, page: int = 1, page_size: int = 10) -> Hypermedia:
+    def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict:
         """
-        Function to return a dictionary matching the Hypermedia TypedDict.
+        Returns a dictionary containing pagination details.
+
+        Args:
+            page (int): The page number.
+            page_size (int): The number of items per page.
+
+        Returns:
+            Dict: A dictionary containing pagination details.
         """
-
-        full_dataset = self.dataset()
-        total_pages = math.ceil(len(full_dataset) / page_size)
-
         data = self.get_page(page, page_size)
-        next_page = (page + 1)
-        if next_page > total_pages:
-            next_page = None
-        previous_page = (page - 1)
-        if previous_page < 1:
-            previous_page = None
+        total_items = len(self.dataset())
+        total_pages = math.ceil(total_items / page_size)
 
-        Hyper = {
-            'page_size': page_size,
-            'page': page,
-            'data': data,
-            'next_page': next_page,
-            'previous_page': previous_page,
-            'total_pages': total_pages
+        next_page = page + 1 if page < total_pages else None
+        prev_page = page - 1 if page > 1 else None
+
+        return {
+            "page_size": len(data),
+            "page": page,
+            "data": data,
+            "next_page": next_page,
+            "prev_page": prev_page,
+            "total_pages": total_pages,
         }
-        return Hyper
